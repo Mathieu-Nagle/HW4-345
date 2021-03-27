@@ -25,10 +25,10 @@ if (process.env.NODE_ENV != 'test')
 {
 	(async () => {
 		await listAuthenicatedUserRepos();
-		await listBranches(userId, "SSW345-HW4");
+		await listBranches(userId, "HW4-345");
 		await createRepo(userId, "REST-New-Repo");
-		await createIssue(userId, "SSW345-HW4", "New Issue", "REST made this issue");
-		//await enableWikiSupport(userId,repo);
+		await createIssue(userId, "HW4-345", "New Issue", "REST made this issue");
+		await enableWikiSupport(userId, "HW4-345");
 
 	})()
 }
@@ -175,14 +175,16 @@ async function createIssue(owner, repo, issueName, issueBody)
 // 4. Write code for editing a repo to enable wiki support.
 async function enableWikiSupport(owner,repo)
 {
-	let options = getDefaultOptions("/", "PATCH");
-
+	let options = getDefaultOptions(`/repos/${owner}/${repo}`, "PATCH");
+	options.json = {
+		has_wiki:true
+	}
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
 		request(options, function (error, response, body) {
 
-			resolve( JSON.parse(body) );
+			resolve( body );
 		});
 	});	
 }
