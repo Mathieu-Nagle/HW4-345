@@ -25,9 +25,9 @@ if (process.env.NODE_ENV != 'test')
 {
 	(async () => {
 		await listAuthenicatedUserRepos();
-		//await listBranches(userId, "your repo");
-		//await createRepo(userId,newrepo);
-		//await createIssue(userId, repo, issue);
+		await listBranches(userId, "SSW345-HW4");
+		await createRepo(userId, "REST-New-Repo");
+		await createIssue(userId, "SSW345-HW4", "New Issue", "REST made this issue");
 		//await enableWikiSupport(userId,repo);
 
 	})()
@@ -94,13 +94,25 @@ function listAuthenicatedUserRepos()
 // 1. Write code for listBranches in a given repo under an owner. See list branches
 async function listBranches(owner,repo)
 {
-	let options = getDefaultOptions(`/`, "GET");
+	let options = getDefaultOptions(`/repos/${owner}/${repo}/branches`, "GET");
 
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
 		request(options, function (error, response, body) {
+			if( error )
+			{
+				console.log( chalk.red( error ));
+				reject(error);
+				return; // Terminate execution.
+			}
 
+			var obj = JSON.parse(body);
+			for( var i = 0; i < obj.length; i++ )
+			{
+				var name = obj[i].name;
+				console.log( name );
+			}
 			// console.debug( options );
 			resolve( JSON.parse(body) );
 
@@ -111,12 +123,21 @@ async function listBranches(owner,repo)
 // 2. Write code to create a new repo
 async function createRepo(owner,repo)
 {
-	let options = getDefaultOptions("/", "POST");
+	let options = getDefaultOptions(`/user/repos`, "POST");
+	options.json = {
+		name:`${repo}`
+	}
 
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
 		request(options, function (error, response, body) {
+			if( error )
+			{
+				console.log( chalk.red( error ));
+				reject(error);
+				return; // Terminate execution.
+			}
 
 			resolve( response.statusCode );
 
@@ -125,14 +146,25 @@ async function createRepo(owner,repo)
 
 }
 // 3. Write code for creating an issue for an existing repo.
-async function createIssue(owner,repo, issueName, issueBody)
+async function createIssue(owner, repo, issueName, issueBody)
 {
-	let options = getDefaultOptions("/", "POST");
-
+	let options = getDefaultOptions(`/repos/${owner}/${repo}/issues`, "POST");
+	
+	options.json = {
+		title:`${issueName}`, 
+		body:`${issueBody}`
+	}
+	
 	// Send a http request to url and specify a callback that will be called upon its return.
 	return new Promise(function(resolve, reject)
 	{
 		request(options, function (error, response, body) {
+			if( error )
+			{
+				console.log( chalk.red( error ));
+				reject(error);
+				return; // Terminate execution.
+			}
 
 			resolve( response.statusCode );
 
@@ -161,5 +193,3 @@ module.exports.listBranches = listBranches;
 module.exports.createRepo = createRepo;
 module.exports.createIssue = createIssue;
 module.exports.enableWikiSupport = enableWikiSupport;
-
-
